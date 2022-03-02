@@ -4,7 +4,7 @@ pipeline {
   environment {
     PROJECT = 'jhipster'
     VERSION = '1.0'
-    BRANCH = 'master'
+    BRANCH = 'main'
     POLARIS_ACCESS_TOKEN = credentials('mj-polaris-token')
     BLACKDUCK_ACCESS_TOKEN = credentials('mj-blackduck-token')
     IO_TOKEN = credentials('mj-io-token')
