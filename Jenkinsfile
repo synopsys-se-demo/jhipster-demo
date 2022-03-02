@@ -22,9 +22,7 @@ pipeline {
         sh 'npm install'
       }
     }
-  }
 
-  stages {
     stage('Build') {
       agent { label 'ubuntu' }
       steps {
