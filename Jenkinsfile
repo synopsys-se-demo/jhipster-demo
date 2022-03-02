@@ -155,8 +155,8 @@ pipeline {
 
               selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
 
-
-
+              # Give Seeker some time to do it's stuff; API collation, testing etc.
+              sleep 60
 
 
               kill $serverMessage
@@ -186,7 +186,7 @@ pipeline {
             --sca.rescan.threshold="20" \
             --scm.type="github" \
             --scm.owner="jones6951" \
-            --scm.repo.name="apache-roller" \
+            --scm.repo.name="jhipster-sample-app" \
             --scm.branch.name="${BRANCH}" \
             --github.username="jones6951" \
             --github.token="${GITHUB_TOKEN}" \
