@@ -111,7 +111,7 @@ pipeline {
             unzip -j polaris_cli-linux64.zip -d /tmp
             rm polaris_cli-linux64.zip
             /tmp/polaris --persist-config --co project.name="${PROJECT}" --co project.branch="${BRANCH}" --co capture.build.buildCommands="null" --co capture.build.cleanCommands="null" --co capture.fileSystem="null" --co capture.coverity.autoCapture="enable" configure
-            /tmp/polaris analyze -w
+            #/tmp/polaris analyze -w
           #else
           #  echo "Skipping Coverity on Polaris based on prescription"
           #fi
