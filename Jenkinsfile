@@ -153,6 +153,9 @@ pipeline {
           if ( /tmp/isNumeric.sh $serverMessage); then
               echo "Running IAST Tests"
 
+              selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
+
+
 
 
 
