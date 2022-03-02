@@ -5,8 +5,6 @@ pipeline {
     PROJECT = 'jhipster'
     VERSION = '1.0'
     BRANCH = 'main'
-    GITHUB_TOKEN = credentials('mj-github-token')
-    SEEKER_TOKEN = credentials('seeker-token')
     SERVER_START = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
