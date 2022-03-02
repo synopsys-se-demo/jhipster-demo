@@ -10,6 +10,7 @@ pipeline {
     IO_TOKEN = credentials('mj-io-token')
     CODEDX_TOKEN = credentials('mj-codedx-token')
     GITHUB_TOKEN = credentials('mj-github-token')
+    SEEKER_TOKEN = credentials('mj-seeker-token')
     SERVER_START = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
@@ -166,6 +167,7 @@ pipeline {
         '''
       }
     }
+
     stage ('IO Workflow - Code Dx') {
       agent { label 'ubuntu' }
       steps {
