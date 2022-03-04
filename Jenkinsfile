@@ -14,6 +14,7 @@ pipeline {
     SERVER_START = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
+    SEEKER_RUN_TIME = 180
   }
 
   stages {
@@ -144,7 +145,7 @@ pipeline {
       steps {
         sh '''
 #          cd ${SERVER_WORKINGDIR}
-	sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'http://seeker.lan:8080/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=')"
+	sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' '${SEEKER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=')"
 
           export SEEKER_PROJECT_VERSION=${VERSION}
           export SEEKER_AGENT_NAME=${AGENT}
@@ -157,12 +158,13 @@ pipeline {
               selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
 
               # Give Seeker some time to do it's stuff; API collation, testing etc.
-              sleep 60
+              sleep ${SEEKER_RUN_TIME}
 
 
               kill $serverMessage
           else
               echo $serverMessage
+              return 1
           fi
         '''
       }
