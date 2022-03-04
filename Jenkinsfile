@@ -145,7 +145,7 @@ pipeline {
       steps {
         sh '''
 #          cd ${SERVER_WORKINGDIR}
-	sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' '${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=')"
+	sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
 
           export SEEKER_PROJECT_VERSION=${VERSION}
           export SEEKER_AGENT_NAME=${AGENT}
