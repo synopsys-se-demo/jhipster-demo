@@ -15,6 +15,7 @@ pipeline {
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 180
+    SEEKER_PROJECT_KEY = 'jhip'
   }
 
   stages {
@@ -144,8 +145,9 @@ pipeline {
       agent { label 'ubuntu' }
       steps {
         sh '''
-#          cd ${SERVER_WORKINGDIR}
-	sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+          if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
+
+	  sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
 
           export SEEKER_PROJECT_VERSION=${VERSION}
           export SEEKER_AGENT_NAME=${AGENT}
@@ -159,7 +161,6 @@ pipeline {
 
               # Give Seeker some time to do it's stuff; API collation, testing etc.
               sleep ${SEEKER_RUN_TIME}
-
 
               kill $serverMessage
           else
