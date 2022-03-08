@@ -50,6 +50,15 @@
       }
     },
     {
+      "took_name": "seeker",
+      "enabled": "<<IS_DAST_ENABLED>>",
+      "fields": {
+        "project_name": "<<SEEKER_PROJECT_NAME>>",
+        "instance_url": "<<SEEKER_SERVER_URL>>",
+        "auth_token": "<SEEKER_ACCESS_TOKEN>>"
+      }
+    },
+    {
       "tool_name": "blackduck",
       "enabled": "<<IS_SCA_ENABLED>>",
       "fields": {
