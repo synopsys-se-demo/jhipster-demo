@@ -166,6 +166,9 @@ pipeline {
             # Give Seeker some time to do it's stuff; API collation, testing etc.
             sleep ${SEEKER_RUN_TIME}
 
+            testResponse=$(curl -X 'PUT' "${SEEKER_SERVER_URL}/rest/api/latest/testruns/$testRunID/close" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: ${SEEKER_TOKEN}" -d 'completed=true')
+            echo "Finished Testing. [$testResponse]"
+
             kill $serverMessage
           else
             echo $serverMessage
