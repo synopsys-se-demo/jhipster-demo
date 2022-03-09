@@ -82,6 +82,9 @@ pipeline {
             --blackduck.url="${BLACKDUCK_SERVER_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
             --jira.enable="false" \
+            --seeker.url="${SEEKER SERVER_URL}" \
+            --seeker.token="${SEEKER_TOKEN}" \
+            --seeker.project.name="${PROJECT}" \
             --codedx.url="${CODEDX_SERVER_URL}/codedx" \
             --codedx.api.key="${CODEDX_TOKEN}" \
             --codedx.project.id="$projectID" \
@@ -99,15 +102,17 @@ pipeline {
         }
       }
     }
+    stage('Security Testing') {
+      parallel {
 
-    stage('SAST - Coverity on Polaris') {
-      when {
-        expression { env.IS_SAST_ENABLED == "true" }
-      }
-      agent { label 'ubuntu' }
-      steps {
-        sh '''
-          #if [ ${env.IS_SAST_ENABLED} = "true" ]; then
+        stage('SAST - Coverity on Polaris') {
+        when {
+          expression { env.IS_SAST_ENABLED == "true" }
+        }
+        agent { label 'ubuntu' }
+        steps {
+          sh '''
+            #if [ ${env.IS_SAST_ENABLED} = "true" ]; then
             echo "Running Coverity on Polaris"
             rm -fr /tmp/polaris 2>/dev/null
             wget -q ${POLARIS_SERVER_URL}/api/tools/polaris_cli-linux64.zip
@@ -118,44 +123,46 @@ pipeline {
           #else
           #  echo "Skipping Coverity on Polaris based on prescription"
           #fi
-        '''
+          '''
+        }
       }
-    }
 
-    stage ('SCA - Black Duck') {
-      when {
-        expression { env.IS_SCA_ENABLED == "true" }
+      stage ('SCA - Black Duck') {
+        when {
+          expression { env.IS_SCA_ENABLED == "true" }
+        }
+        agent { label 'ubuntu' }
+        steps {
+          sh '''
+            echo "Running BlackDuck"
+            rm -fr /tmp/detect7.sh
+            curl -s -L https://detect.synopsys.com/detect7.sh > /tmp/detect7.sh
+            bash /tmp/detect7.sh --blackduck.url="${BLACKDUCK_URL}" --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" --detect.project.name="${PROJECT}" --detect.project.version.name="${VERSION}" --blackduck.trust.cert=true
+            # --detect.blackduck.scan.mode=RAPID
+          '''
+        }
       }
-      agent { label 'ubuntu' }
-      steps {
-        sh '''
-          echo "Running BlackDuck"
-          rm -fr /tmp/detect7.sh
-          curl -s -L https://detect.synopsys.com/detect7.sh > /tmp/detect7.sh
-          bash /tmp/detect7.sh --blackduck.url="${BLACKDUCK_URL}" --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" --detect.project.name="${PROJECT}" --detect.project.version.name="${VERSION}" --blackduck.trust.cert=true
-          # --detect.blackduck.scan.mode=RAPID
-        '''
-      }
-    }
 
-    stage ('IAST - Seeker') {
-      when {
-        expression { env.IS_DAST_ENABLED == "true" }
-      }
-      agent { label 'ubuntu' }
-      steps {
-        sh '''
-          if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
+      stage ('IAST - Seeker') {
+        when {
+          expression { env.IS_DAST_ENABLED == "true" }
+        }
+        agent { label 'ubuntu' }
+        steps {
+          sh '''
+            if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
 
-	  sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+            sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
 
-          export SEEKER_PROJECT_VERSION=${VERSION}
-          export SEEKER_AGENT_NAME=${AGENT}
-          export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
+            export SEEKER_PROJECT_VERSION=${VERSION}
+            export SEEKER_AGENT_NAME=${AGENT}
+            export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
 
-          serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
-          if ( /tmp/isNumeric.sh $serverMessage); then
+            serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
+            if ( /tmp/isNumeric.sh $serverMessage); then
               echo "Running IAST Tests"
+              testRun=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: Bearer ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}")
+echo $testRun
 
               selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
 
@@ -163,11 +170,12 @@ pipeline {
               sleep ${SEEKER_RUN_TIME}
 
               kill $serverMessage
-          else
+            else
               echo $serverMessage
               return 1
-          fi
-        '''
+            fi
+          '''
+        }
       }
     }
 
