@@ -28,7 +28,7 @@ pipeline {
     stage('Build') {
       agent { label 'ubuntu' }
       steps {
-        sh 'mvn clean install'
+        sh 'mvn clean install -DskipTests'
       }
     }
     stage('Set Up Environment') {
@@ -37,12 +37,12 @@ pipeline {
         sh '''
           curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/getProjectID.sh > /tmp/getProjectID.sh
           curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/serverStart.sh > /tmp/serverStart.sh
-          #curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/isNumeric.sh > /tmp/isNumeric.sh
+          curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/isNumeric.sh > /tmp/isNumeric.sh
           curl -s -L https://raw.githubusercontent.com/synopsys-sig/io-artifacts/main/prescription.sh > /tmp/prescription.sh
 
           chmod +x /tmp/getProjectID.sh
           chmod +x /tmp/serverStart.sh
-          #chmod +x /tmp/isNumeric.sh
+          chmod +x /tmp/isNumeric.sh
           chmod +x /tmp/prescription.sh
         '''
       }
@@ -80,9 +80,9 @@ pipeline {
             --blackduck.url="${BLACKDUCK_SERVER_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
             --jira.enable="false" \
-            --seeker.url="${SEEKER SERVER_URL}" \
-            --seeker.token="${SEEKER_TOKEN}" \
-            --seeker.project.name="${PROJECT}" \
+#            --seeker.url="${SEEKER SERVER_URL}" \
+#            --seeker.token="${SEEKER_TOKEN}" \
+#            --seeker.project.name="${PROJECT}" \
             --codedx.url="${CODEDX_SERVER_URL}/codedx" \
             --codedx.api.key="${CODEDX_TOKEN}" \
             --codedx.project.id="$projectID" \
