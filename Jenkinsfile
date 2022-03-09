@@ -158,7 +158,7 @@ pipeline {
           if [[ $serverMessage == ?(-)+([0-9]) ]]; then #Check if value passed back is numeric (PID) or string (Error message).
             echo "Running IAST Tests"
 
-            testRunID=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}" | jq ".[]".key)
+            testRunID=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}" | jq -r ".[]".key)
             echo "Run ID is : "$testRunID
 
             selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
