@@ -136,44 +136,44 @@ pipeline {
             '''
           }
         }
-
-        stage ('IAST - Seeker') {
-          when {
-            expression { env.IS_DAST_ENABLED == "true" }
-          }
-          agent { label 'ubuntu' }
-          steps {
-            sh '''#!/bin/bash
-              if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
-
-              sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
-
-              export SEEKER_PROJECT_VERSION=${VERSION}
-              export SEEKER_AGENT_NAME=${AGENT}
-              export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
-
-              serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
-              if [[ $serverMessage == ?(-)+([0-9]) ]]; then
-                echo "Running IAST Tests"
-                testRun=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: Bearer ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}")
-                echo $testRun
-
-                selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
-
-                # Give Seeker some time to do it's stuff; API collation, testing etc.
-                sleep ${SEEKER_RUN_TIME}
-
-                kill $serverMessage
-              else
-                echo $serverMessage
-                return 1
-              fi
-            '''
-          }
-        }
-
       }
     }
+
+    stage ('IAST - Seeker') {
+      when {
+        expression { env.IS_DAST_ENABLED == "true" }
+      }
+      agent { label 'ubuntu' }
+      steps {
+        sh '''#!/bin/bash
+          if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
+
+          sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+
+          export SEEKER_PROJECT_VERSION=${VERSION}
+          export SEEKER_AGENT_NAME=${AGENT}
+          export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
+
+          serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
+          if [[ $serverMessage == ?(-)+([0-9]) ]]; then
+            echo "Running IAST Tests"
+            testRun=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: Bearer ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}")
+            echo $testRun
+
+            selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
+
+            # Give Seeker some time to do it's stuff; API collation, testing etc.
+            sleep ${SEEKER_RUN_TIME}
+
+            kill $serverMessage
+          else
+            echo $serverMessage
+            return 1
+          fi
+        '''
+      }
+    }
+
     stage ('IO Workflow - Code Dx') {
       agent { label 'ubuntu' }
       steps {
