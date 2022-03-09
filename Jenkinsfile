@@ -17,8 +17,7 @@ pipeline {
     SEEKER_RUN_TIME = 180
     SEEKER_PROJECT_KEY = 'jhip'
   }
-
-  stages {
+  stages{
     stage('NPM Install') {
       agent { label 'ubuntu' }
       steps {
@@ -32,27 +31,26 @@ pipeline {
         sh 'mvn clean install'
       }
     }
-
     stage('Set Up Environment') {
       agent { label 'ubuntu' }
       steps {
         sh '''
           curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/getProjectID.sh > /tmp/getProjectID.sh
           curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/serverStart.sh > /tmp/serverStart.sh
-          curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/isNumeric.sh > /tmp/isNumeric.sh
+          #curl -s -L https://raw.githubusercontent.com/jones6951/io-scripts/main/isNumeric.sh > /tmp/isNumeric.sh
           curl -s -L https://raw.githubusercontent.com/synopsys-sig/io-artifacts/main/prescription.sh > /tmp/prescription.sh
 
           chmod +x /tmp/getProjectID.sh
           chmod +x /tmp/serverStart.sh
-          chmod +x /tmp/isNumeric.sh
+          #chmod +x /tmp/isNumeric.sh
           chmod +x /tmp/prescription.sh
         '''
       }
     }
 
     stage('IO - Get Prescription') {
-      agent { label 'ubuntu' }
-      steps {
+        agent { label 'ubuntu' }
+        steps {
         echo "Getting Prescription"
         sh '''
           projectID=$(/tmp/getProjectID.sh --url=${CODEDX_SERVER_URL} --apikey=${CODEDX_TOKEN} --project=${PROJECT})
@@ -102,29 +100,30 @@ pipeline {
         }
       }
     }
-    stage('Security Testing') {
+
+    stage ('Security Testing') {
       parallel {
         stage('SAST - Coverity on Polaris') {
-        when {
-          expression { env.IS_SAST_ENABLED == "true" }
+          when {
+            expression { env.IS_SAST_ENABLED == "true" }
+          }
+          agent { label 'ubuntu' }
+          steps {
+            sh '''
+              #if [ ${env.IS_SAST_ENABLED} = "true" ]; then
+              echo "Running Coverity on Polaris"
+              rm -fr /tmp/polaris 2>/dev/null
+              wget -q ${POLARIS_SERVER_URL}/api/tools/polaris_cli-linux64.zip
+              unzip -j polaris_cli-linux64.zip -d /tmp
+              rm polaris_cli-linux64.zip
+              /tmp/polaris --persist-config --co project.name="${PROJECT}" --co project.branch="${BRANCH}" --co capture.build.buildCommands="null" --co capture.build.cleanCommands="null" --co capture.fileSystem="null" --co capture.coverity.autoCapture="enable" configure
+              #/tmp/polaris analyze -w
+              #else
+              #  echo "Skipping Coverity on Polaris based on prescription"
+              #fi
+            '''
+          }
         }
-        agent { label 'ubuntu' }
-        steps {
-          sh '''
-            #if [ ${env.IS_SAST_ENABLED} = "true" ]; then
-            echo "Running Coverity on Polaris"
-            rm -fr /tmp/polaris 2>/dev/null
-            wget -q ${POLARIS_SERVER_URL}/api/tools/polaris_cli-linux64.zip
-            unzip -j polaris_cli-linux64.zip -d /tmp
-            rm polaris_cli-linux64.zip
-            /tmp/polaris --persist-config --co project.name="${PROJECT}" --co project.branch="${BRANCH}" --co capture.build.buildCommands="null" --co capture.build.cleanCommands="null" --co capture.fileSystem="null" --co capture.coverity.autoCapture="enable" configure
-            #/tmp/polaris analyze -w
-          #else
-          #  echo "Skipping Coverity on Polaris based on prescription"
-          #fi
-          '''
-        }
-      
         stage ('SCA - Black Duck') {
           when {
             expression { env.IS_SCA_ENABLED == "true" }
@@ -140,14 +139,13 @@ pipeline {
             '''
           }
         }
-
         stage ('IAST - Seeker') {
           when {
             expression { env.IS_DAST_ENABLED == "true" }
           }
           agent { label 'ubuntu' }
           steps {
-            sh '''
+            sh '''#!/bin/bash
               if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
 
               sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
@@ -157,7 +155,7 @@ pipeline {
               export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
 
               serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
-              if ( /tmp/isNumeric.sh $serverMessage); then
+              if [[ $serverMessage == ?(-)+([0-9]) ]]; then
                 echo "Running IAST Tests"
                 testRun=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: Bearer ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}")
                 echo $testRun
@@ -175,6 +173,7 @@ pipeline {
             '''
           }
         }
+
       }
     }
     stage ('IO Workflow - Code Dx') {
@@ -207,6 +206,9 @@ pipeline {
             --blackduck.project.name="${PROJECT}:${VERSION}" \
             --blackduck.url="${BLACKDUCK_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
+            --seeker.url="${SEEKER SERVER_URL}" \
+            --seeker.token="${SEEKER_TOKEN}" \
+            --seeker.project.name="${PROJECT}" \
             --jira.enable="false" \
             --codedx.url="${CODEDX_SERVER_URL}/codedx" \
             --codedx.api.key="${CODEDX_TOKEN}" \
@@ -219,7 +221,6 @@ pipeline {
         '''
       }
     }
-
     stage('Clean Workspace') {
       agent { label 'ubuntu' }
       steps {
