@@ -80,9 +80,6 @@ pipeline {
             --blackduck.url="${BLACKDUCK_SERVER_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
             --jira.enable="false" \
-#            --seeker.url="${SEEKER SERVER_URL}" \
-#            --seeker.token="${SEEKER_TOKEN}" \
-#            --seeker.project.name="${PROJECT}" \
             --codedx.url="${CODEDX_SERVER_URL}/codedx" \
             --codedx.api.key="${CODEDX_TOKEN}" \
             --codedx.project.id="$projectID" \
@@ -207,9 +204,6 @@ pipeline {
             --blackduck.project.name="${PROJECT}:${VERSION}" \
             --blackduck.url="${BLACKDUCK_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
-            --seeker.url="${SEEKER SERVER_URL}" \
-            --seeker.token="${SEEKER_TOKEN}" \
-            --seeker.project.name="${PROJECT}" \
             --jira.enable="false" \
             --codedx.url="${CODEDX_SERVER_URL}/codedx" \
             --codedx.api.key="${CODEDX_TOKEN}" \
