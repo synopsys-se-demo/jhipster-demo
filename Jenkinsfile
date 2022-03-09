@@ -10,7 +10,7 @@ pipeline {
     IO_TOKEN = credentials('mj-io-token')
     CODEDX_TOKEN = credentials('mj-codedx-token')
     GITHUB_TOKEN = credentials('mj-github-token')
-    SEEKER_TOKEN = credentials('mj-seeker-token')
+    SEEKER_TOKEN = credentials('SEEKER_TOKEN')
     SERVER_START = "java -javaagent:seeker/seeker-agent.jar -jar target/jhipster-sample-application-0.0.1-SNAPSHOT.jar"
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
@@ -155,8 +155,9 @@ pipeline {
           export MAVEN_OPTS=-javaagent:seeker/seeker-agent.jar
 
           serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
-          if [[ $serverMessage == ?(-)+([0-9]) ]]; then
+          if [[ $serverMessage == ?(-)+([0-9]) ]]; then #Check if value passed back is numeric (PID) or string (Error message).
             echo "Running IAST Tests"
+
             testRun=$(curl -X 'POST' "${SEEKER_SERVER_URL}/rest/api/latest/testruns" -H 'accept: application/json' -H 'Content-Type: application/x-www-form-urlencoded' -H "Authorization: Bearer ${SEEKER_TOKEN}" -d "type=AUTO_TRIAGE&statusKey=FIXED&projectKey=${SEEKER_PROJECT_KEY}")
             echo $testRun
 
