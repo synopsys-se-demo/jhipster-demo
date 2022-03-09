@@ -139,6 +139,7 @@ pipeline {
             '''
           }
         }
+/*
         stage ('IAST - Seeker') {
           when {
             expression { env.IS_DAST_ENABLED == "true" }
@@ -173,7 +174,7 @@ pipeline {
             '''
           }
         }
-
+*/
       }
     }
     stage ('IO Workflow - Code Dx') {
