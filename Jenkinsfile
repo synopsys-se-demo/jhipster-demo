@@ -15,7 +15,7 @@ pipeline {
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 180
-    SEEKER_PROJECT_KEY = 'jhip2'
+    SEEKER_PROJECT_KEY = 'jhip3'
   }
   stages{
     stage('NPM Install') {
