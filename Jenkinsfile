@@ -17,6 +17,7 @@ pipeline {
     SEEKER_RUN_TIME = 180
     SEEKER_PROJECT_KEY = 'jhip3'
   }
+
   stages{
     stage('NPM Install') {
       agent { label 'ubuntu' }
