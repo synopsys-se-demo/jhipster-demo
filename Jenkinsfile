@@ -63,7 +63,7 @@ pipeline {
             --project.name="${PROJECT}" \
             --asset.id="${PROJECT}" \
             --workflow.url="${IO_SERVER_URL}/api/workflowengine/" \
-            --workflow.version="2021.12.0" \
+            --workflow.version="2022.4.1" \
             --file.change.threshold="10" \
             --sast.rescan.threshold="20" \
             --sca.rescan.threshold="20" \
@@ -192,7 +192,7 @@ pipeline {
             --manifest.type="json" \
             --asset.id="${PROJECT}" \
             --workflow.url="${IO_SERVER_URL}/api/workflowengine/" \
-            --workflow.version="2021.12.0" \
+            --workflow.version="2022.4.1" \
             --file.change.threshold="10" \
             --sast.rescan.threshold="20" \
             --sca.rescan.threshold="20" \
