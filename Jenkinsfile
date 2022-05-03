@@ -75,6 +75,7 @@ pipeline {
             --github.username="jones6951" \
             --github.token="${GITHUB_TOKEN}" \
             --polaris.project.name="${PROJECT}" \
+            --polaris.branch.name="${BRANCH}" \
             --polaris.url="${POLARIS_SERVER_URL}" \
             --polaris.token="${POLARIS_ACCESS_TOKEN}" \
             --blackduck.project.name="${PROJECT}:${VERSION}" \
@@ -204,6 +205,7 @@ pipeline {
             --github.username="jones6951" \
             --github.token="${GITHUB_TOKEN}" \
             --polaris.project.name="${PROJECT}" \
+            --polaris.branch.name="${BRANCH}" \
             --polaris.url="${POLARIS_SERVER_URL}" \
             --polaris.token="${POLARIS_ACCESS_TOKEN}" \
             --blackduck.project.name="${PROJECT}:${VERSION}" \
