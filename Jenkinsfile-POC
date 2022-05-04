@@ -11,6 +11,18 @@ pipeline {
   }
 
   stages {
+    stage('NPM Install') {
+      steps {
+        sh 'npm install'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'mvn clean install -DskipTests'
+      }
+    }
+
     stage('Set Up Environment') {
       steps {
         sh '''
