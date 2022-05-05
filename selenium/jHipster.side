@@ -2,7 +2,7 @@
   "id": "0550fec9-8804-4572-aee8-785839d94017",
   "version": "2.0",
   "name": "jHipster",
-  "url": "http://localhost:8080",
+  "url": "http://localhost:8082",
   "tests": [{
     "id": "cfc515d4-935f-4f6d-bc2f-1b517289933d",
     "name": "Basic",
@@ -172,6 +172,6 @@
     "timeout": 300,
     "tests": ["cfc515d4-935f-4f6d-bc2f-1b517289933d"]
   }],
-  "urls": ["http://localhost:8080/"],
+  "urls": ["http://localhost:8082/"],
   "plugins": []
 }
