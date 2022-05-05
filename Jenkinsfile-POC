@@ -52,6 +52,7 @@ pipeline {
           serverMessage=$(/tmp/serverStart.sh --startCmd="${SERVER_START}" --startedString="${SERVER_STRING}" --project="${PROJECT}" --timeout="60s" &)
           if ( /tmp/isNumeric.sh $serverMessage); then
               echo "Running IAST Tests"
+              npm test
 
               selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
 
