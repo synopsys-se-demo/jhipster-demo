@@ -54,7 +54,7 @@ pipeline {
               echo "Running IAST Tests"
               npm test
 
-              selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
+              selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=${WORKSPACE} ${WORKSPACE}/selenium/jHipster.side
 
               # Give Seeker some time to do it's stuff; API collation, testing etc.
               sleep 60
