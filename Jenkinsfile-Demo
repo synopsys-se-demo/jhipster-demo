@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    PROJECT = 'jhipster'
+    PROJECT = 'jhipster-IO'
     VERSION = '1.0'
     BRANCH = 'main'
     POLARIS_ACCESS_TOKEN = credentials('polaris-token')
