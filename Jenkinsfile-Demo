@@ -50,7 +50,7 @@ pipeline {
         steps {
         echo "Getting Prescription"
         sh '''
-          projectID=$(/tmp/getProjectID.sh --url=${CODEDX_SERVER_URL} --apikey=${CODEDX_TOKEN} --project=${PROJECT})
+          projectID=$(/tmp/getProjectID.sh --url=${CODEDX_URL} --apikey=${CODEDX_TOKEN} --project=${PROJECT})
           /tmp/prescription.sh \
             --stage="IO" \
             --persona="devsecops" \
