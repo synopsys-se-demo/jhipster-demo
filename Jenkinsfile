@@ -29,7 +29,7 @@ pipeline {
     stage('Build') {
       agent { label 'ubuntu' }
       steps {
-        sh 'mvn clean install -DskipTests'
+        sh 'mvn clean package -DskipTests'
       }
     }
     stage('Set Up Environment') {
