@@ -60,7 +60,8 @@ pipeline {
             echo "Run ID is : "$testRunID
 
             selenium-side-runner -c "browserName=firefox moz:firefoxOptions.args=[-headless]" --output-directory=/tmp ${WORKSPACE}/selenium/jHipster.side
-
+            ./mvnw verify
+            npm test
             # Give Seeker some time to do it's stuff; API collation, testing etc.
             sleep ${SEEKER_RUN_TIME}
 
