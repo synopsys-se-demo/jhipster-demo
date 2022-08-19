@@ -10,7 +10,7 @@ pipeline {
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 60
-    SEEKER_PROJECT_KEY = 'mtest1'
+    SEEKER_PROJECT_KEY = 'liron'
   }
 
   stages{
