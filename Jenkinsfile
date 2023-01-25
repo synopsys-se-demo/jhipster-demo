@@ -6,6 +6,7 @@ pipeline {
     VERSION = '1.0'
     BRANCH = 'main'
     POLARIS_ACCESS_TOKEN = credentials('mj-polaris-token')
+    COVERITYONPOLARIS_ACCESS_TOKEN = credentials('mj-coverityonpolaris-token')
     BLACKDUCK_ACCESS_TOKEN = credentials('mj-blackduck-token')
     IO_TOKEN = credentials('mj-io-token')
     CODEDX_TOKEN = credentials('mj-codedx-token')
@@ -15,7 +16,7 @@ pipeline {
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 180
-    SEEKER_PROJECT_KEY = 'jhip3'
+    SEEKER_PROJECT_KEY = 'jhip53'
   }
 
   stages{
@@ -80,8 +81,8 @@ pipeline {
             --github.token="${GITHUB_TOKEN}" \
             --polaris.project.name="${PROJECT}" \
             --polaris.branch.name="${BRANCH}" \
-            --polaris.url="${POLARIS_SERVER_URL}" \
-            --polaris.token="${POLARIS_ACCESS_TOKEN}" \
+            --polaris.url="${COVERITYONPOLARIS_SERVER_URL}" \
+            --polaris.token="${COVERITYONPOLARIS_ACCESS_TOKEN}" \
             --blackduck.project.name="${PROJECT}:${VERSION}" \
             --blackduck.url="${BLACKDUCK_SERVER_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
@@ -116,7 +117,7 @@ pipeline {
               #if [ ${env.IS_SAST_ENABLED} = "true" ]; then
               echo "Running Coverity on Polaris"
               rm -fr /tmp/polaris 2>/dev/null
-              wget -q ${POLARIS_SERVER_URL}/api/tools/polaris_cli-linux64.zip
+              wget -q ${COVERITYONPOLARIS_SERVER_URL}/api/tools/polaris_cli-linux64.zip
               unzip -j polaris_cli-linux64.zip -d /tmp
               rm polaris_cli-linux64.zip
               /tmp/polaris --persist-config --co project.name="${PROJECT}" --co project.branch="${BRANCH}" --co capture.build.buildCommands="null" --co capture.build.cleanCommands="null" --co capture.fileSystem="null" --co capture.coverity.autoCapture="enable" configure
@@ -154,7 +155,8 @@ pipeline {
         sh '''#!/bin/bash
           if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
 
-          sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+#          sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
+          sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' 'http://192.168.2.33:8080/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=jhip53&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=')"
 
           export SEEKER_PROJECT_VERSION=${VERSION}
           export SEEKER_AGENT_NAME=${AGENT}
@@ -210,8 +212,8 @@ pipeline {
             --github.token="${GITHUB_TOKEN}" \
             --polaris.project.name="${PROJECT}" \
             --polaris.branch.name="${BRANCH}" \
-            --polaris.url="${POLARIS_SERVER_URL}" \
-            --polaris.token="${POLARIS_ACCESS_TOKEN}" \
+            --polaris.url="${COVERITYONPOLARIS_SERVER_URL}" \
+            --polaris.token="${COVERITYONPOLARIS_ACCESS_TOKEN}" \
             --blackduck.project.name="${PROJECT}:${VERSION}" \
             --blackduck.url="${BLACKDUCK_URL}" \
             --blackduck.api.token="${BLACKDUCK_ACCESS_TOKEN}" \
