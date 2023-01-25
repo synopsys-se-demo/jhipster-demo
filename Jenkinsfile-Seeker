@@ -10,7 +10,7 @@ pipeline {
     SERVER_STRING = "Application 'jhipsterSampleApplication' is running!"
     SERVER_WORKINGDIR = ""
     SEEKER_RUN_TIME = 60
-    SEEKER_PROJECT_KEY = 'liron'
+    SEEKER_PROJECT_KEY = 'jhip53'
   }
 
   stages{
@@ -45,7 +45,8 @@ pipeline {
       steps {
         sh '''#!/bin/bash
           if [ ! -z ${SERVER_WORKINGDIR} ]; then cd ${SERVER_WORKINGDIR}; fi
-
+echo "IN HERE"
+echo "URL is ${SEEKER_SERVER_URL}"
           sh -c "$( curl -k -X GET -fsSL --header 'Accept: application/x-sh' \"${SEEKER_SERVER_URL}/rest/api/latest/installers/agents/scripts/JAVA?osFamily=LINUX&downloadWith=curl&projectKey=${SEEKER_PROJECT_KEY}&webServer=TOMCAT&flavor=DEFAULT&agentName=&accessToken=\")"
 
           export SEEKER_PROJECT_VERSION=${VERSION}
